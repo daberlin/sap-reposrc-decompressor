@@ -3,7 +3,7 @@
 *&---------------------------------------------------------------------*
 *& Purpose: Download compressed source code from table REPOSRC
 *& Author : Daniel Berlin
-*& Version: 1.0.0
+*& Version: 1.0.1
 *& License: CC BY 3.0 (http://creativecommons.org/licenses/by/3.0/)
 *&---------------------------------------------------------------------*
 
@@ -20,10 +20,12 @@ PARAMETERS: report TYPE progname DEFAULT sy-repid           "#EC *
 
 START-OF-SELECTION.
 
-  " -- Select local file name
   WHILE v_fnam IS INITIAL.
+    v_fnam = report.
+
     CALL FUNCTION 'NAVIGATION_FILENAME_HELP'
       EXPORTING
+        default_path      = v_fnam
         mode              = 'S'
       IMPORTING
         selected_filename = v_fnam.
