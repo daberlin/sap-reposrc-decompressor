@@ -16,9 +16,10 @@
 //--------------------------------------------------------------------------------------------------
 // Changes:
 //   2012-06-23 - 1.0.0 - Initial version
+//   2012-06-24 - 1.0.1 - Revert modifications to MaxDB library
 //--------------------------------------------------------------------------------------------------
 
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 
 // Silence MS Visual C++ ("... consider using fopen_s instead ...")
 #ifdef _MSC_VER
@@ -86,7 +87,11 @@ int main(int argc, char *argv[]) {
 		return 2;
 	}
 
-	printf("Compressed source read from file '%s'\n", argv[1]);
+	printf("Compressed source read from '%s'\n", argv[1]);
+
+	// Determine compression algorithm
+	ret = o.CsGetAlgorithm(bin + 1);
+	printf("Algorithm: %u (1 = LZC, 2 = LZH)\n", ret);
 
 	for (;;) {
 		// Create output buffer with an initial size factor of 10 x input buffer
@@ -101,7 +106,6 @@ int main(int argc, char *argv[]) {
 			, CS_INIT_DECOMPRESS	// Decompression
 			, &byte_read			// Bytes read from input buffer
 			, &byte_decomp			// Bytes decompressed to output buffer
-			, factor > 10 ? 0 : 1	// Print algorithm information only once
 		);
 
 		// Output buffer too small -> increase size factor and retry
@@ -152,7 +156,7 @@ int main(int argc, char *argv[]) {
 	fwrite("\n", 1, 1, fout);
 	fclose(fout);
 
-	printf("Plain source code written to file '%s'\nHave a nice day\n\n", argv[2]);
+	printf("Plain source code written to '%s'\nHave a nice day\n\n", argv[2]);
 
 	free(bout);
 	return 0;

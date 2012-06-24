@@ -186,7 +186,7 @@ typedef struct CSH
 
 	TREE_DESC d_desc;
 
-	TREE_DESC bl_desc;
+	TREE_DESC bl_desc; 
 
 	SAP_BYTE window[(BUF_SIZE1)];
 	SAP_BYTE InterBuf[(BUF_SIZE2)];
@@ -364,7 +364,7 @@ typedef struct CSC
 
  BYTE_TYP * in_ptr;             /* global input ptr ............*/
  BYTE_TYP * end_inbuf;          /* end of input buffer .........*/
- BYTE_TYP *stack_end;
+ BYTE_TYP *stack_end;  
 
  int hshift;
  CODE_INT ent;
@@ -402,8 +402,7 @@ public:
                SAP_INT    outlen,        /* len output ......*/
                SAP_INT    option,        /* decompr. option  */
                SAP_INT *  bytes_read,    /* bytes read ......*/
-               SAP_INT *  bytes_decompressed,  /* bytes decompr.  */
-               int        show_algo);
+               SAP_INT *  bytes_decompressed); /* bytes decompr.  */
 
 	int CsGetAlgorithm (SAP_BYTE * data);
 
