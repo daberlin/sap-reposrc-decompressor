@@ -20,6 +20,7 @@ PARAMETERS: report TYPE progname DEFAULT sy-repid           "#EC *
 
 START-OF-SELECTION.
 
+  " -- Select local file name
   WHILE v_fnam IS INITIAL.
     v_fnam = report.
 
