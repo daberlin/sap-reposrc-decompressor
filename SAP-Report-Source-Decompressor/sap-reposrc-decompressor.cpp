@@ -20,6 +20,11 @@
 
 #define VERSION "1.0.0"
 
+// Silence MS Visual C++ ("... consider using fopen_s instead ...")
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
