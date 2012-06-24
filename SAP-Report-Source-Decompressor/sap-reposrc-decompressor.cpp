@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------------------
-// SAP source code decompressor
+// SAP Source Code Decompressor
 //--------------------------------------------------------------------------------------------------
 // Written by Daniel Berlin <mail@daniel-berlin.de> - http://www.daniel-berlin.de/
 // Inspired by code from Dennis Yurichev <dennis@conus.info> - http://www.yurichev.com/
@@ -40,13 +40,13 @@ int main(int argc, char *argv[]) {
 	SAP_INT byte_read, byte_decomp;	// Number of bytes read and decompressed
 	int i;							// Loop counter
 
-	printf("\n-------------------------------------------\n");
-	printf("SAP source code decompressor, version %s\n", VERSION);
-	printf("-------------------------------------------\n\n");
+	printf("\n------------------------------------\n");
+	printf("SAP Source Code Decompressor, v%s\n", VERSION);
+	printf("------------------------------------\n\n");
 
 	// Check command line parameters
 	if (argc != 3 || argv[1] == NULL || argv[2] == NULL) {
-		printf("Usage: %s <input> <output>\n", argv[0]);
+		printf("Usage: %s <infile> <outfile>\n\n", argv[0]);
 		return 0;
 	}
 
@@ -55,13 +55,6 @@ int main(int argc, char *argv[]) {
 	if (fin == NULL) {
 		printf("Error: Failed to open input file '%s'\n", argv[1]);
 		return 1;
-	}
-
-	// Create output file
-	fout = fopen(argv[2], "wb");
-	if (fout == NULL) {
-		printf("Error: Failed to create output file '%s'\n", argv[2]);
-		return 2;
 	}
 
 	// Determine size of input file
@@ -81,6 +74,13 @@ int main(int argc, char *argv[]) {
 
 	fclose(fin);
 
+	// Create output file
+	fout = fopen(argv[2], "wb");
+	if (fout == NULL) {
+		printf("Error: Failed to create output file '%s'\n", argv[2]);
+		return 2;
+	}
+
 	printf("Compressed source read from file '%s'\n", argv[1]);
 
 	for (;;) {
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 			, CS_INIT_DECOMPRESS	// Decompression
 			, &byte_read			// Bytes read from input buffer
 			, &byte_decomp			// Bytes decompressed to output buffer
-			, (factor > 10 ? 0 : 1)	// Print algorithm information only once
+			, factor > 10 ? 0 : 1	// Print algorithm information only once
 		);
 
 		// Output buffer too small -> increase size factor and retry
@@ -105,6 +105,8 @@ int main(int argc, char *argv[]) {
 			factor += 10;
 			continue;
 		}
+
+		free(bin);
 
 		// Handle all other return codes
 		switch (ret) {
@@ -120,7 +122,6 @@ int main(int argc, char *argv[]) {
 			default                    : printf("Error: Unknown status\n"        ); return 10;
 		}
 
-		free(bin);
 		break;
 	}
 
@@ -133,7 +134,7 @@ int main(int argc, char *argv[]) {
 			ret = fwrite(bout + i, 1, 1, fout);
 		}
 		else {
-			fwrite("\n", 1, 1, fout);
+			ret = fwrite("\n", 1, 1, fout);
 		}
 
 		if (ret != 1) {
