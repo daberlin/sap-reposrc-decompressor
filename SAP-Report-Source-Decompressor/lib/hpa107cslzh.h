@@ -28,6 +28,7 @@
  *     SAP AG Walldorf
  *     Systeme, Anwendungen und Produkte in der Datenverarbeitung
  *
+ *     (C) Copyright (c) 1994-2005 SAP AG
  */
 
 /*--------------------------------------------------------------------*/
