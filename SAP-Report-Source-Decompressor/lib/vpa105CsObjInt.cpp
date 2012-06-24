@@ -133,7 +133,8 @@ int CsObjectInt::CsDecompr (SAP_BYTE * inbuf,         /* ptr input .......*/
                SAP_INT    outlen,        /* len output ......*/
                SAP_INT    option,        /* decompr. option  */
                SAP_INT *  bytes_read,    /* bytes read ......*/
-               SAP_INT *  bytes_decompressed) /* bytes decompr.  */
+               SAP_INT *  bytes_decompressed, /* bytes decompr.  */
+               int        show_algo)
 /*--------------------------------------------------------------------*/
 /*     Decompress                                                     */
 /*                                                                    */
@@ -177,6 +178,8 @@ int CsObjectInt::CsDecompr (SAP_BYTE * inbuf,         /* ptr input .......*/
   {
     if (inlen < CS_HEAD_SIZE) return CS_E_IN_BUFFER_LEN;
     algorithm = CsGetAlgorithm (inbuf);
+    if (show_algo > 0)
+      printf("%s: %u (1 = LZC, 2 = LZH)\n", "Algorithm", algorithm);
   }
 
   switch (algorithm)
@@ -332,7 +335,7 @@ int CsObjectInt::CsInitDecompr (SAP_BYTE * inbuf)
 
   rc = CsDecompr (inbuf, CS_HEAD_SIZE,
                   outbuf, 0, CS_INIT_DECOMPRESS,
-                  &bytes_read, &bytes_written);
+                  &bytes_read, &bytes_written, 0);
 
   if (rc < 0) return rc;
   return 0;
