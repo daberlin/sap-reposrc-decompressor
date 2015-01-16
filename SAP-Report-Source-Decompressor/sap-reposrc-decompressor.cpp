@@ -17,9 +17,10 @@
 // Changes:
 //   2012-06-23 - 1.0.0 - Initial version
 //   2012-06-24 - 1.0.1 - Revert modifications to MaxDB library
+//   2015-01-05 - 1.1.0 - Major UTF-16 enhancement by Uwe Lindemann
 //--------------------------------------------------------------------------------------------------
 
-#define VERSION "1.0.1"
+#define VERSION "1.1.0"
 
 // Silence MS Visual C++ ("... consider using fopen_s instead ...")
 #ifdef _MSC_VER
@@ -29,6 +30,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "lib/hpa101saptype.h"
 #include "lib/hpa106cslzc.h"
@@ -44,17 +46,28 @@ int main(int argc, char *argv[]) {
 	short factor = 10;				// Initial output buffer size factor
 	class CsObjectInt o;			// Class containing the decompressor
 	SAP_INT byte_read, byte_decomp;	// Number of bytes read and decompressed
-	int i;							// Loop counter
+	long i;							// Loop counter
+	long nextpos;					// Position of the next length field
+
+	char cuc[] = "-u";				// Unicode parameter
+	int funicode;					// Unicode flag
+
+	unsigned char cbom1 = (unsigned char) 0xFE;		// BOM for UTF-16: 0xFEFF
+	unsigned char cbom2 = (unsigned char) 0xFF;		// ...
 
 	printf("\n------------------------------------\n");
 	printf("SAP Source Code Decompressor, v%s\n", VERSION);
 	printf("------------------------------------\n\n");
 
 	// Check command line parameters
-	if (argc != 3 || argv[1] == NULL || argv[2] == NULL) {
-		printf("Usage: %s <infile> <outfile>\n\n", argv[0]);
+	if (argc < 3 || argc > 4 || argv[1] == NULL || argv[2] == NULL) {
+		printf("Usage:\n  %s <infile> <outfile> [-u]\n\n", argv[0]);
+		printf("Options:\n  -u : create UTF-16 output; defaults to ASCII\n\n");
 		return 0;
 	}
+
+	if (argc == 4 && strcmp(argv[3], cuc) == 0) { funicode = 1; }
+	else                                        { funicode = 0; }
 
 	// Open input file
 	fin = fopen(argv[1], "rb");
@@ -134,16 +147,34 @@ int main(int argc, char *argv[]) {
 		break;
 	}
 
-	// Write the buffer to the output file:
-	//  - skip the first 2 bytes   (-> strange !)
-	//  - only read every 2nd byte (-> strange !)
-	//  - replace character 255 with a newline
-	for (i = 3; i < byte_decomp; i += 2) {
-		if(bout[i] != 255) {
-			ret = fwrite(bout + i, 1, 1, fout);
+	// In case of Unicode output: write UTF-16 BOM
+	if (funicode) {
+		fwrite(&cbom1, 1, 1, fout);
+		fwrite(&cbom2, 1, 1, fout);
+	}
+
+	// The 2nd byte contains the length of the first line.
+	// Compute position of next length field.
+	nextpos = ((long) bout[1]) * 2 + 3;
+
+	for (i = 2; i < byte_decomp; i++) {
+		if ((i % 2) == 0) {
+			if (funicode) {
+				// In case of Unicode output: write Big Endian byte
+				ret = fwrite(bout + i, 1, 1, fout);
+			}
 		}
 		else {
-			ret = fwrite("\n", 1, 1, fout);
+			if (i == nextpos) {
+				// Write line feed
+				ret = fwrite("\n", 1, 1, fout);
+
+				// Compute position of next length field
+				nextpos = nextpos + (((long) bout[i]) * 2 + 2);
+			}
+			else {
+				ret = fwrite(bout + i, 1, 1, fout);
+			}
 		}
 
 		if (ret != 1) {
@@ -156,7 +187,9 @@ int main(int argc, char *argv[]) {
 	fwrite("\n", 1, 1, fout);
 	fclose(fout);
 
-	printf("Plain source code written to '%s'\nHave a nice day\n\n", argv[2]);
+	if (funicode) { printf("Unicode"   ); }
+	else          { printf("Plain text"); }
+	printf(" source written to '%s'\nHave a nice day\n\n", argv[2]);
 
 	free(bout);
 	return 0;
