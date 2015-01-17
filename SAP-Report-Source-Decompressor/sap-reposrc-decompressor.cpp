@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 	// Open input file
 	fin = fopen(argv[1], "rb");
 	if (fin == NULL) {
-		printf("Error: Failed to open input file '%s'\n", argv[1]);
+		printf("Error opening input file '%s'\n", argv[1]);
 		return 1;
 	}
 
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 	// Create output file
 	fout = fopen(argv[2], "wb");
 	if (fout == NULL) {
-		printf("Error: Failed to create output file '%s'\n", argv[2]);
+		printf("Error creating output file '%s'\n", argv[2]);
 		return 2;
 	}
 
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
 
 	// Determine compression algorithm
 	ret = o.CsGetAlgorithm(bin + 1);
-	printf("Algorithm: %u (1 = LZC, 2 = LZH)\n", ret);
+	printf("Algorithm: %i (1 = LZC, 2 = LZH)\n", ret);
 
 	for (;;) {
 		// Create output buffer with an initial size factor of 10 x input buffer
