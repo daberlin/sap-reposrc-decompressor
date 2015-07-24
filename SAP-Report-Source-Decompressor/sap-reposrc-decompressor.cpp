@@ -21,7 +21,7 @@
 //   2015-07-24 - 1.1.1 - Add option for non-unicode SAP systems by Bastian Preiﬂler
 //--------------------------------------------------------------------------------------------------
 
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 
 // Silence MS Visual C++ ("... consider using fopen_s instead ...")
 #ifdef _MSC_VER
