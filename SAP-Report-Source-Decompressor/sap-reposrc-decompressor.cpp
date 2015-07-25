@@ -53,8 +53,8 @@ int main(int argc, char *argv[]) {
 	char cuc[] = "-u";				// Unicode parameter
 	int funicode;					// Unicode flag
 
-	char nuc[] = "-n";				// Non-UC SAP System parameter
-	int fnuc;						// Non-UC SAP System flag
+	char nuc[] = "-n";				// Non-Unicode SAP system parameter
+	int fnuc;						// Non-Unicode SAP system flag
 
 	unsigned char cbom1 = (unsigned char) 0xFE;		// BOM for UTF-16: 0xFEFF
 	unsigned char cbom2 = (unsigned char) 0xFF;		// ...
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 	if (argc < 3 || argc > 4 || argv[1] == NULL || argv[2] == NULL) {
 		printf("Usage:\n  %s <infile> <outfile> [-u] [-n]\n\n", argv[0]);
 		printf("Options:\n  -u : create UTF-16 output; defaults to ASCII\n");
-		printf("  -n : for non-unicode SAP systems; defaults to unicode\n\n");
+		printf("  -n : assume input from non-unicode SAP system\n\n");
 		return 0;
 	}
 
@@ -105,6 +105,8 @@ int main(int argc, char *argv[]) {
 	fout = fopen(argv[2], "wb");
 	if (fout == NULL) {
 		printf("Error creating output file '%s'\n", argv[2]);
+		// Make CppCheck happy ("memory leak: bin")
+		// cppcheck-suppress memleak
 		return 2;
 	}
 
@@ -164,11 +166,11 @@ int main(int argc, char *argv[]) {
 	// The 2nd byte contains the length of the first line.
 	// For non-unicode SAP systems the 1st byte contains the length of the first line.
 	// Compute position of next length field.
-	if (fnuc) {	
-		nextpos = (long)bout[0]; 
+	if (fnuc) {
+		nextpos = (long)bout[0];
 	}
-	else	  { 
-		nextpos = ((long)bout[1]) * 2 + 3; 
+	else	  {
+		nextpos = ((long)bout[1]) * 2 + 3;
 	}
 
 	for (i = 1; i < byte_decomp; i++) {
@@ -185,7 +187,7 @@ int main(int argc, char *argv[]) {
 				ret = fwrite("\n", 1, 1, fout);
 
 				// Compute position of next length field
-				if (fnuc) { 
+				if (fnuc) {
 					nextpos = nextpos + (long)bout[0] + 1;
 					i += 1;
 				}
