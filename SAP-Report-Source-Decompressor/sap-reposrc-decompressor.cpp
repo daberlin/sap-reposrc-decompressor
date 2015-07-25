@@ -18,9 +18,10 @@
 //   2012-06-23 - 1.0.0 - Initial version
 //   2012-06-24 - 1.0.1 - Revert modifications to MaxDB library
 //   2015-01-05 - 1.1.0 - Major UTF-16 enhancement by Uwe Lindemann
+//   2015-07-24 - 1.1.1 - Add option for non-unicode SAP systems by Bastian Preiﬂler
 //--------------------------------------------------------------------------------------------------
 
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 
 // Silence MS Visual C++ ("... consider using fopen_s instead ...")
 #ifdef _MSC_VER
@@ -52,6 +53,9 @@ int main(int argc, char *argv[]) {
 	char cuc[] = "-u";				// Unicode parameter
 	int funicode;					// Unicode flag
 
+	char nuc[] = "-n";				// Non-UC SAP System parameter
+	int fnuc;						// Non-UC SAP System flag
+
 	unsigned char cbom1 = (unsigned char) 0xFE;		// BOM for UTF-16: 0xFEFF
 	unsigned char cbom2 = (unsigned char) 0xFF;		// ...
 
@@ -61,13 +65,17 @@ int main(int argc, char *argv[]) {
 
 	// Check command line parameters
 	if (argc < 3 || argc > 4 || argv[1] == NULL || argv[2] == NULL) {
-		printf("Usage:\n  %s <infile> <outfile> [-u]\n\n", argv[0]);
-		printf("Options:\n  -u : create UTF-16 output; defaults to ASCII\n\n");
+		printf("Usage:\n  %s <infile> <outfile> [-u] [-n]\n\n", argv[0]);
+		printf("Options:\n  -u : create UTF-16 output; defaults to ASCII\n");
+		printf("  -n : for non-unicode SAP systems; defaults to unicode\n\n");
 		return 0;
 	}
 
 	if (argc == 4 && strcmp(argv[3], cuc) == 0) { funicode = 1; }
 	else                                        { funicode = 0; }
+
+	if (argc == 4 && strcmp(argv[3], nuc) == 0) { fnuc = 1; }
+	else										{ fnuc = 0; }
 
 	// Open input file
 	fin = fopen(argv[1], "rb");
@@ -154,11 +162,18 @@ int main(int argc, char *argv[]) {
 	}
 
 	// The 2nd byte contains the length of the first line.
+	// For non-unicode SAP systems the 1st byte contains the length of the first line.
 	// Compute position of next length field.
-	nextpos = ((long) bout[1]) * 2 + 3;
+	if (fnuc) {	
+		nextpos = (long)bout[0]; 
+	}
+	else	  { 
+		nextpos = ((long)bout[1]) * 2 + 3; 
+	}
 
-	for (i = 2; i < byte_decomp; i++) {
-		if ((i % 2) == 0) {
+	for (i = 1; i < byte_decomp; i++) {
+		if (i == 1 && !fnuc) { continue; }
+		if ((i % 2) == 0 && !fnuc) {
 			if (funicode) {
 				// In case of Unicode output: write Big Endian byte
 				ret = fwrite(bout + i, 1, 1, fout);
@@ -170,7 +185,13 @@ int main(int argc, char *argv[]) {
 				ret = fwrite("\n", 1, 1, fout);
 
 				// Compute position of next length field
-				nextpos = nextpos + (((long) bout[i]) * 2 + 2);
+				if (fnuc) { 
+					nextpos = nextpos + (long)bout[0] + 1;
+					i += 1;
+				}
+				else {
+					nextpos = nextpos + (((long)bout[i]) * 2 + 2);
+				}
 			}
 			else {
 				ret = fwrite(bout + i, 1, 1, fout);
