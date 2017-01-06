@@ -1,4 +1,12 @@
 language: cpp
+
 script:
   - cd SAP-Report-Source-Decompressor
-  - ./build.sh
+  - bash build.sh
+
+notifications:
+  email:
+    recipients:
+      - mail@daniel-berlin.de
+    on_success: change
+    on_failure: always
