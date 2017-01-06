@@ -1,0 +1,4 @@
+language: cpp
+script:
+  - cd SAP-Report-Source-Decompressor
+  - ./build.sh
