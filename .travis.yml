@@ -2,10 +2,8 @@ language: cpp
 
 script:
   - cd SAP-Report-Source-Decompressor
-  - bash build.sh
-
-after_success:
-  - ./sap-reposrc-decompressor
+  - make
+  - make test
 
 notifications:
   email:
