@@ -9,9 +9,8 @@ clean:
 	$(RM) sap-reposrc-decompressor tests/ZDBTEST.*.txt
 
 test:
-	cd tests
-	../sap-reposrc-decompressor ZDBTEST.bin ZDBTEST.ascii.txt
-	../sap-reposrc-decompressor ZDBTEST.bin ZDBTEST.utf16.txt -u
-	md5sum -c CHECKSUM.md5
+	sap-reposrc-decompressor tests/ZDBTEST.bin tests/ZDBTEST.ascii.txt
+	sap-reposrc-decompressor tests/ZDBTEST.bin tests/ZDBTEST.utf16.txt -u
+	md5sum -c tests/CHECKSUM.md5
 
 .PHONY: clean test
