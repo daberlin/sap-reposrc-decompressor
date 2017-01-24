@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project DefaultTargets="Clean;Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<AppName>sap-reposrc-decompressor</AppName>
+	</PropertyGroup>
+
+	<Target Name="Build">
+		<Exec Command="cl.exe /Ox /W3 $(AppName).cpp lib\*.cpp" />
+	</Target>
+	<Target Name="Clean">
+		<Delete Files="$(AppName).exe" />
+	</Target>
+</Project>

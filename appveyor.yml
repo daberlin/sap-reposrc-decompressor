@@ -1,0 +1,30 @@
+os: Visual Studio 2015
+version: {branch}-{build}
+
+platform:
+  - x86
+  - x64
+
+build:
+  parallel: false
+  project: Makefile.proj
+  verbosity: detailed
+
+before_build:
+  - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %platform%
+  - cd SAP-Report-Source-Decompressor
+
+before_test:
+  - if exist tests\ZDBTEST.*.txt del tests\ZDBTEST.*.txt
+
+test_script:
+  - sap-reposrc-decompressor tests\ZDBTEST.bin tests\ZDBTEST.ascii.txt
+  - sap-reposrc-decompressor tests\ZDBTEST.bin tests\ZDBTEST.utf16.txt -u
+  - md5sum -c tests\CHECKSUM.md5
+
+notifications:
+  - provider: Email
+    to: mail@daniel-berlin.de
+    on_build_success: false
+    on_build_failure: true
+    on_build_status_changed: true
