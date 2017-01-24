@@ -5,14 +5,12 @@ platform:
   - x86
   - x64
 
-build:
-  parallel: false
-  project: Makefile.proj
-  verbosity: detailed
-
 before_build:
   - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %platform%
+
+build_script:
   - cd SAP-Report-Source-Decompressor
+  - MSBuild.exe Makefile.proj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:detailed
 
 before_test:
   - if exist tests\ZDBTEST.*.txt del tests\ZDBTEST.*.txt
