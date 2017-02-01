@@ -18,7 +18,7 @@
 //   2012-06-23 - 1.0.0 - Initial version
 //   2012-06-24 - 1.0.1 - Revert modifications to MaxDB library
 //   2015-01-05 - 1.1.0 - Major UTF-16 enhancement by Uwe Lindemann
-//   2015-07-24 - 1.1.1 - Add option for non-unicode SAP systems by Bastian Preiﬂler
+//   2015-07-24 - 1.1.1 - Add option for non-unicode SAP systems by Bastian Prei√üler
 //--------------------------------------------------------------------------------------------------
 
 #define VERSION "1.1.1"
@@ -105,8 +105,7 @@ int main(int argc, char *argv[]) {
 	fout = fopen(argv[2], "wb");
 	if (fout == NULL) {
 		printf("Error creating output file '%s'\n", argv[2]);
-		// Make CppCheck happy ("memory leak: bin")
-		// cppcheck-suppress memleak
+		free(bin);
 		return 2;
 	}
 
