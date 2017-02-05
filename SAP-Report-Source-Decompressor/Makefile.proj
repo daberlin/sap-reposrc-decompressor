@@ -1,14 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <Project DefaultTargets="Clean;Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<PropertyGroup>
-		<AppName>sap-reposrc-decompressor</AppName>
-	</PropertyGroup>
 
 	<Target Name="Build">
-		<Exec Command="cl.exe /Ox /W3 $(AppName).cpp lib\*.cpp" />
+		<Exec Command="cl.exe /Ox /W3 sap-reposrc-decompressor.cpp lib\*.cpp" />
 	</Target>
+
 	<Target Name="Clean">
-		<Delete Files="$(AppName).exe" />
+		<CallTarget Targets="Clean-Exe;Clean-Obj" />
 	</Target>
+
+	<Target Name="Clean-Exe">
+		<ItemGroup>
+			<FilesToDelete Include="*.exe" />
+		</ItemGroup>   
+		<Delete Files="@(FilesToDelete)" />   
+	</Target>
+
+	<Target Name="Clean-Obj">
+		<ItemGroup>
+			<FilesToDelete Include="*.obj" />
+			<FilesToDelete Include="lib\*.obj" />
+		</ItemGroup>   
+		<Delete Files="@(FilesToDelete)" />   
+	</Target>
+
 </Project>
