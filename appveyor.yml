@@ -10,15 +10,10 @@ before_build:
 
 build_script:
   - cd SAP-Report-Source-Decompressor
-  - MSBuild.exe Makefile.proj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:detailed
-
-before_test:
-  - if exist tests\ZDBTEST.*.txt del tests\ZDBTEST.*.txt
+  - MSBuild.exe /l:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /v:d
 
 test_script:
-  - sap-reposrc-decompressor tests\ZDBTEST.bin tests\ZDBTEST.ascii.txt
-  - sap-reposrc-decompressor tests\ZDBTEST.bin tests\ZDBTEST.utf16.txt -u
-  - md5sum -c tests\CHECKSUM.md5
+  - MSBuild.exe /t:Test /l:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /v:d
 
 notifications:
   - provider: Email
